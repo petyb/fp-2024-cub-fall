@@ -35,7 +35,8 @@ ageOn planet ageInSeconds | planet == "Mercury" = ageInSeconds /  0.2408467 / to
                           | otherwise = error "Give a valid planet name"
 
 isLeapYear :: Int -> Bool
-isLeapYear year = (year `mod` 4 == 0 && year `mod` 100 /= 0) || ((year `mod` 400) == 0)
+isLeapYear year | year < 0 = error "year should be positive"
+                | otherwise = (year `mod` 4 == 0 && year `mod` 100 /= 0) || ((year `mod` 400) == 0)
 
 main = do
   runTests
