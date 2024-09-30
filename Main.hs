@@ -9,8 +9,7 @@ module Main where
 import Control.Monad (unless)
 import qualified Data.List as L
 import Text.Printf (printf)
-
-aboba (a, b) = a + b
+import Text.XHtml.Transitional (concatHtml)
 
 multByIndex :: [Int] -> [Int]
 multByIndex ls = zipWith (*) ls [0..]
@@ -19,20 +18,10 @@ powerByIndex :: [Int] -> [Int]
 powerByIndex ls = zipWith (^) ls [0..]
 
 productOfDifference :: [Int] -> Int
-productOfDifference [] = error "list is too short"
-productOfDifference [_] = error "list is too short"
-productOfDifference ls = foldl (*) 1 (zipWith (-) (init ls) (tail ls))
+productOfDifference ls = foldl (*) 1 (zipWith (-) ls (tail ls))
 
 isSorted :: [Int] -> Bool
-isSorted [] = True
-isSorted [_] = True
-isSorted (x:xs) = (x <= head xs) && isSorted xs
-
--- check :: Int -> Int -> Int
--- check x y = if x == y then 1 else 0
-
--- countElement :: Int -> [Int] -> Int
--- countElement x ls = foldl (+) 0 (map (check x) ls)
+isSorted ls = and (zipWith (<=) ls (tail ls))
 
 countElement :: Int -> [Int] -> Int
 countElement x ls = length (filter (== x) ls)
@@ -44,7 +33,7 @@ applyAll :: [a -> b] -> a -> [b]
 applyAll ls x = map (\y -> y x) ls
 
 interleave :: [a] -> [a] -> [a]
-interleave a b = foldl (\ls (a, b) -> ls ++ [a, b]) [] (zip a b) 
+interleave a b = concatMap (\(a, b) -> [a, b]) (zip a b)
 
 main = do
   runTests
