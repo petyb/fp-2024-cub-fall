@@ -3,7 +3,8 @@ module Main where
 import Control.Monad (unless)
 import Text.Printf (printf)
 import Distribution.Compat.ResponseFile (expandResponse)
-import Text.XHtml (base, abbr, reset)
+import Text.XHtml (base, abbr, reset, background)
+import System.Win32 (xBUTTON1)
 
 data Expr = Num Double
           | Sqrt Expr
@@ -24,63 +25,41 @@ instance Show Expr where
   show (Pow expr1 expr2) = "(" ++ show expr1 ++ ") ^ (" ++ show expr2 ++ ")"
 
 instance Eq Expr where
-  a == b = show a == show b
+  a == b = eval a == eval b
 
 
-data Error = ZeroDivision
-           | NegativeNumberSqrt
+data Error = ZeroDivision Expr
+           | NegativeNumberSqrt Expr 
 
 instance Show Error where
   show :: Error -> String
-  show ZeroDivision = "Division by zero error"
-  show NegativeNumberSqrt = "Taking square root from a negative number error"
-
+  show (ZeroDivision expr) = "Division by zero error in the expression " ++ show expr
+  show (NegativeNumberSqrt expr) = "Taking square root from a negative number error in the expression" ++ show expr
 
 instance Eq Error where
-  ZeroDivision == ZeroDivision = True
-  NegativeNumberSqrt == NegativeNumberSqrt = True
-  _ == _ = False
+  (ZeroDivision _) == (ZeroDivision _) = True
+  (NegativeNumberSqrt _) == (NegativeNumberSqrt _) = True
+
+
+eval1 :: (Double -> Double -> Double) -> Expr -> Expr -> Either Error Double
+eval1 f exp1 exp2 = let
+                  a = eval exp1
+                  b = eval exp2
+                in case (a, b) of
+                  (Right a, Right b) -> Right (f a b)
+                  (Left a, _) -> Left a
+                  (_, Left b) -> Left b
 
 eval :: Expr -> Either Error Double
 eval (Num a) = Right a
 eval (Sqrt exp) = let res = eval exp in case res of
-  Right x -> if x >= 0 then Right (sqrt x) else Left NegativeNumberSqrt
+  Right x -> if x >= 0 then Right (sqrt x) else Left (NegativeNumberSqrt (Sqrt exp))
   Left x -> Left x
-eval (Add exp1 exp2) = let
-                  a = eval exp1
-                  b = eval exp2
-                in case (a, b) of
-                  (Right a, Right b) -> Right (a + b)
-                  (Left a, _) -> Left a
-                  (_, Left b) -> Left b
-eval (Sub exp1 exp2) = let
-                  a = eval exp1
-                  b = eval exp2
-                in case (a, b) of
-                  (Right a, Right b) -> Right (a - b)
-                  (Left a, _) -> Left a
-                  (_, Left b) -> Left b
-eval (Mul exp1 exp2) = let
-                  a = eval exp1
-                  b = eval exp2
-                in case (a, b) of
-                  (Right a, Right b) -> Right (a * b)
-                  (Left a, _) -> Left a
-                  (_, Left b) -> Left b
-eval (Div exp1 exp2) = let
-                  a = eval exp1
-                  b = eval exp2
-                in case (a, b) of
-                  (Right a, Right b) -> if b == 0 then Left ZeroDivision else Right (a / b)
-                  (Left a, _) -> Left a
-                  (_, Left b) -> Left b
-eval (Pow exp1 exp2) = let
-                  a = eval exp1
-                  b = eval exp2
-                in case (a, b) of
-                  (Right a, Right b) -> Right (a ** b)
-                  (Left a, _) -> Left a
-                  (_, Left b) -> Left b
+eval (Add exp1 exp2) = eval1 (+) exp1 exp2
+eval (Sub exp1 exp2) = eval1 (-) exp1 exp2
+eval (Mul exp1 exp2) = eval1 (*) exp1 exp2
+eval (Div exp1 exp2) = if eval exp2 == Right 0 then Left (ZeroDivision (Div exp1 exp2)) else eval1 (/) exp1 exp2
+eval (Pow exp1 exp2) = eval1 (**) exp1 exp2
 
 cases :: [(Expr, Either Error Double)]
 cases = [
@@ -96,10 +75,10 @@ cases = [
     -- long expression
     (Sub (Add (Num 2.0) (Div (Num 9.0) (Num 3.0))) (Sqrt (Mul (Num 2.0) (Num 8.0))), Right 1.0),
 
-    (Add (Div (Num 2.0) (Num 0.0)) (Num 3.0), Left ZeroDivision), -- left error
-    (Add (Num 3.0) (Div (Num 2.0) (Num 0.0)), Left ZeroDivision), -- right error
-    (Add (Div (Num 2.0) (Num 0.0)) (Sqrt(Num (-1.0))), Left ZeroDivision), -- two errors
-    (Add (Sqrt(Num (-1.0))) (Div (Num 2.0) (Num 0.0)), Left NegativeNumberSqrt) -- two errors
+    (Add (Div (Num 2.0) (Num 0.0)) (Num 3.0), Left (ZeroDivision (Div (Num 2.0) (Num 0.0)))), -- left error
+    (Add (Num 3.0) (Div (Num 2.0) (Num 0.0)), Left (ZeroDivision (Div (Num 2.0) (Num 0.0)))), -- right error
+    (Add (Div (Num 2.0) (Num 0.0)) (Sqrt(Num (-1.0))), Left (ZeroDivision (Div (Num 2.0) (Num 0.0)))), -- two errors
+    (Add (Sqrt(Num (-1.0))) (Div (Num 2.0) (Num 0.0)), Left (NegativeNumberSqrt (Sqrt(Num(-1.0))))) -- two errors
   ]
 
 test :: Expr -> Either Error Double -> IO ()
