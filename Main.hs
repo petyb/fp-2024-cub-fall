@@ -3,8 +3,7 @@ module Main where
 import Control.Monad (unless)
 import Text.Printf (printf)
 import Distribution.Compat.ResponseFile (expandResponse)
-import Text.XHtml (base, abbr, reset, background)
-import System.Win32 (xBUTTON1)
+import Text.XHtml (base, abbr, reset)
 
 data Expr = Num Double
           | Sqrt Expr
