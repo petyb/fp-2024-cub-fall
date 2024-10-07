@@ -2,8 +2,6 @@ module Main where
 
 import Control.Monad (unless)
 import Text.Printf (printf)
-import Distribution.Compat.ResponseFile (expandResponse)
-import Text.XHtml (base, abbr, reset)
 
 data Expr = Num Double
           | Sqrt Expr
@@ -12,6 +10,7 @@ data Expr = Num Double
           | Mul Expr Expr
           | Div Expr Expr
           | Pow Expr Expr
+        deriving (Eq)
 
 
 instance Show Expr where
@@ -22,10 +21,6 @@ instance Show Expr where
   show (Mul expr1 expr2) = "(" ++ show expr1 ++ ") * (" ++ show expr2 ++ ")"
   show (Div expr1 expr2) = "(" ++ show expr1 ++ ") / (" ++ show expr2 ++ ")"
   show (Pow expr1 expr2) = "(" ++ show expr1 ++ ") ^ (" ++ show expr2 ++ ")"
-
-instance Eq Expr where
-  a == b = eval a == eval b
-
 
 data Error = ZeroDivision Expr
            | NegativeNumberSqrt Expr 
