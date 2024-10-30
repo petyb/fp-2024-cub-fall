@@ -1,42 +1,85 @@
-# HW01
-## Soft deadline: 23:59 17.09.2024
-## Hard deadline: 23:59 19.09.2024
+# midterm
 
-1. (1 point) Implement the predicate `short` which checks that the input list has length less than 3. 
+## Deadline: 09:35 30.10.2024
 
-2. (1 point) Implement the predicate `lovely` that checks that a list is either short (length <3) or has the number `14` as its third element. 
+The midterm consists of two parts: a test and a coding assignment. You have 75 minutes to complete both, and the order of submission does not matter. Anything submitted after the deadline will not be checked. If your code does not compile, it will not be checked. 
 
-3. (1 point) Create an infinite list of possible integer lengths of sides of a right triangle.
-    * make sure there are no repetitions.
-    * make sure that the lengths are ordered.
+While working on the midterm, you are allowed to use ghci, ghc, hoogle, and vscode extension. You must work on your own. Cheating of any kind, including copying code of your classmates is not permitted: this is against the Code of Conduct of the university.
 
-4. (1 point) Create an infinite list of string values for a Fizz-Buzz challenge
-    * `["1", "2", "Fizz", "4", "Buzz", ..., "14", "FizzBuzz", ...]`
-    *  use `show` to turn a number into a string
+## Test
 
-5. (1 point) Given an age in seconds, calculate how old (in years) someone would be on a different planet. Implement a function `ageOn planet ageInSeconds` which returns the age in years represented as a floating point number of type `Float`. Planet name is a `String`, case sensitive. An error should be reported if an unrecognised planet is passed into. If someone tried to find their age on Pluto, explain to them that it's not a planet. 
+Follow the link in the [table](https://docs.google.com/spreadsheets/d/1B1rBfjwMu3NL8Ssa6BptbRfpvG7mRZUlvfs9NTQyeEc/edit?usp=sharing) to get access to your midterm variant. 
 
-   * Mercury: orbital period 0.2408467 Earth years
-   * Venus: orbital period 0.61519726 Earth years
-   * Earth: orbital period 1.0 Earth years, 365.25 Earth days, or 31557600 seconds
-   * Mars: orbital period 1.8808158 Earth years
-   * Jupiter: orbital period 11.862615 Earth years
-   * Saturn: orbital period 29.447498 Earth years
-   * Uranus: orbital period 84.016846 Earth years
-   * Neptune: orbital period 164.79132 Earth years
+## Coding assignment
 
-6. (1 point) Given a year, report if it is a leap year (function `isLeapYear year`). A leap year in the Gregorian calendar occurs:
+Your task is to create a data structure that reflects the hierarchy of directories and files in the given file. This data structure can then be used for various manipulations, but we will limit ourselves with printing it to a string. 
 
-   * on every year that is evenly divisible by 4
-   * except every year that is evenly divisible by 100
-   * unless the year is also evenly divisible by 400
+Your code will be graded based not only on whether it functions or not, but also on the use of appropriate Haskell features, library functions, and its readability. Make sure to avoid code duplication and split your code into modules in a way it makes sense. You are expected to add necessary dependencies on your own. You can derive instances, but not edit types of the given functions or data types declarations. 
 
-   For example, 1997 is not a leap year, but 1996 is. 1900 is not a leap year, but 2000 is. Report an error, if the year is negative. 
+1. [1 point] In [midterm/src/Directory.hs](midterm/src/Directory.hs), define an appropriate type called `DirectoryTree` to represent the directory hierarchy based on the data structure defined in the [midterm/src/Tree.hs](midterm/src/Tree.hs).
 
-## Notes 
+2. [10 points] In [midterm/src/Directory.hs](midterm/src/Directory.hs), implement a function `buildTree :: FilePath -> IO DirectoryTree` that creates a tree which represents the hierarchy of files and subdirectories of the given directory.
+  
+   * Ignore symlinks and other complications. 
+   * Hoogle functions such as `doesDirectoryExist` and `listDirectory` and use them.
 
-* Make a fork of this repository and checkout the branch `HW01`.
-* Write your code in the `Main.hs` file: replace `undefined` with your definitions.
-* Make sure that your tests pass, i.e. running `main` (or `./Main`) only outputs `Done`.
-* If you need more tests, add them, but don't delete the ones which are already in the file. 
-* When finished, open a pull request into the main repo. Make sure to put your name in the title of the PR.  
+3. [5 points] In [midterm/src/Directory.hs](midterm/src/Directory.hs), implement a function that displays the `DirectoryTree`. The subdirectories of the current directory should go before the files in it. Example of use on the [midterm](midterm) directory: 
+
+```
+/Users/.../midterm
+  .stack-work
+    dist
+    ghci
+    install
+    stack.sqlite3
+    stack.sqlite3.pantry-write-lock
+  app
+    Main.hs
+  src
+    Directory.hs
+    Tree.hs
+  test
+    Spec.hs
+  .gitignore
+  CHANGELOG.md
+  LICENSE
+  README.md
+  Setup.hs
+  midterm.cabal
+  package.yaml
+  stack.yaml
+  stack.yaml.lock
+```
+
+4. [5 points] In [midterm/src/Directory.hs](midterm/src/Directory.hs), implement a function that displays the `DirectoryTree`. The subdirectories and the files within the current directory should be ordered alphabetically.  Example of use on the [midterm](midterm) directory: 
+
+```
+/Users/.../midterm
+  .gitignore
+  .stack-work
+    dist
+    ghci
+    install
+    stack.sqlite3
+    stack.sqlite3.pantry-write-lock
+  CHANGELOG.md
+  LICENSE
+  README.md
+  Setup.hs
+  app
+    Main.hs
+  midterm.cabal
+  package.yaml
+  src
+    Directory.hs
+    Tree.hs
+  stack.yaml
+  stack.yaml.lock
+  test
+    Spec.hs
+```
+
+5. [3 points] In [midterm/app/Main.hs](midterm/app/Main.hs), implement a function `run` that asks the user for the directory name and the sorting type, constructs the tree and then displays it accordingly.
+
+6. [1 points] In [midterm/app/Main.hs](midterm/app/Main.hs), implement the `main` function that calls the `run` to demonstrate your code works. 
+ 
