@@ -28,6 +28,8 @@ library
       Cont.Main
       Cont.MyCont
       Expr
+      FailCont.FailCont
+      FailCont.Main
       HW.Compiler
       HW.Eval
       HW.Main

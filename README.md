@@ -1,13 +1,12 @@
-# HW05
-## Soft deadline: 23:59 22.10.2024
-## Hard Deadline: 23:59 24.10.2024
+# HW06
+## Soft deadline: 23:59 05.11.2024
+## Hard Deadline: 23:59 07.11.2024
 
-This homework is to implement the compilation of our tiny expression language into a stack machine language. Check the stack machine language defined in [HW/StackMachine.hs](monads/HW/StackMachine.hs), consult the comments in the other files of the directory, and ask questions if there are any. 
+Homework is in [monads/src/FailCont/](monads/src/FailCont/)
 
-1. (2 point) Implement the compiler in [HW/Compiler.hs](monads/HW/Compiler.hs). 
+1. [1 point] Define type `FailCont` which encapsulates a computation with two possible continuations: one to call in case of a success, and the other to call in case of a failure. 
+2. [3 points] Implement `Functor`, `Applicative` and `Monad` instances for `FailCont`.
+3. [1 points] Implement interface functions `toFailCont` and `evalFailCont`. 
+4. [1 points] Implement functions `addInts` and `divInts` which demonstrate the use of `FailCont`. 
+5. [2 points] Implement another example of its use, and try to be creative. 
 
-2. (3 points) Implement the interpreter `execInstr` in [HW/Eval.hs](monads/HW/Eval.hs). 
-
-3. (1 point) Implement the interpreter `execProgram` in [HW/Eval.hs](monads/HW/Eval.hs). 
-
-4. (2 point) Write unit tests that check that both compilation and evaluation work correctly. Ensure good coverage. 
