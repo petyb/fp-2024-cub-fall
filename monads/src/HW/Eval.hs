@@ -29,27 +29,20 @@ initialState = MachineState [] M.empty
 -- Execute a single instruction. 
 -- Successful evaluation does not produce any useful result: only the effect of modifying state matters. 
 execInstr :: (Ord v, Show v) => StackInstr v -> MyState (MachineState v) (Either (Error v) ())
-execInstr (PushNum x) = do 
-  state <- get 
-  put (state {getStack = x : getStack state, getEnv = getEnv state})
-  return (Right ())
+execInstr (PushNum x) = fmap (const (Right ())) (modify (\s -> s { getStack = x : getStack s }))
 
 execInstr (PushVar v) = do
   state <- get
   let env = getEnv state
   case M.lookup v env of
     Nothing -> return (Left (VarUndefined ("Undefined variable " ++ show v)))
-    Just val -> do
-      put (state {getStack = val : getStack state, getEnv = env})
-      return (Right ())
+    Just val -> fmap (const (Right ())) (modify (\s -> s { getStack = val : getStack state }))
 
-execInstr (Add) = do
+execInstr Add = do
   state <- get
   let stack = getStack state
   case stack of
-    (x:y:xs) -> do
-      put (state {getStack = ((x + y) : xs), getEnv = getEnv state})
-      return (Right ())
+    (x:y:xs) -> fmap (const (Right ())) (modify (\s -> s { getStack = (x + y) : xs }))
     _ -> return (Left (StackUnderflow Add))
 
 execInstr (StoreVar var) = do
@@ -60,7 +53,6 @@ execInstr (StoreVar var) = do
       put (state {getStack = xs, getEnv = M.insert var x (getEnv state)})
       return (Right ())
     _ -> return (Left (StackUnderflow (StoreVar var)))
-
 
 -- Execute a list of instructions starting from the given state. 
 execProgram :: (Ord v, Show v) => StackProgram v -> MachineState v -> Either (Error v) (MachineState v)
