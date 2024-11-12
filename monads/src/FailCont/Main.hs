@@ -10,27 +10,31 @@ data Error
   | NotPrime Int
   deriving (Show, Eq)
 
+readMaybeHelper :: String -> String -> Either Error (Int, Int)
+readMaybeHelper s1 s2 = case readMaybe s1 of
+  Nothing -> Left (ParseFailed s1)
+  Just x -> case readMaybe s2 of
+      Nothing -> Left (ParseFailed s2)
+      Just y -> Right (x, y)
+
 addInts :: String -> String -> FailCont r Error Int
 addInts "" _ = FailCont $ \f -> f (Left EmptyInput)
 addInts _ "" = FailCont $ \f -> f (Left EmptyInput)
 addInts s1 s2 = FailCont $ \f ->
-  case readMaybe s1 of
-    Nothing -> f (Left (ParseFailed s1))
-    Just x -> case readMaybe s2 of
-      Nothing -> f (Left (ParseFailed s2))
-      Just y -> f (Right (x + y))
+  case readMaybeHelper s1 s2 of
+    Right (x, y) -> f (Right (x + y))
+    Left err -> f (Left err)
+
 
 divInts :: String -> String -> FailCont r Error Int 
 divInts "" _ = FailCont $ \f -> f (Left EmptyInput)
 divInts _ "" = FailCont $ \f -> f (Left EmptyInput)
 divInts s1 s2 = FailCont $ \f ->
-  case readMaybe s2 of
-    Nothing -> f (Left (ParseFailed s2))
-    Just 0 -> f (Left DivisionByZero)
-    Just x -> case readMaybe s1 of
-      Nothing -> f (Left (ParseFailed s1))
-      Just 0 -> f (Left DivisionByZero)
-      Just y -> f (Right (y `div` x))
+  case readMaybeHelper s1 s2 of
+    Right (0, _) -> f (Left DivisionByZero)
+    Right (_, 0) -> f (Left DivisionByZero)
+    Right (x, y) -> f (Right (y `div` x))
+    Left err -> f (Left err)
 
 notPrime :: Int -> Bool
 notPrime 1 = True
@@ -43,13 +47,10 @@ getLegendreSymbol a p = if a `mod` p == 0 then 0 else if (a ^ ((p - 1) `div` 2))
 legendreSymbol :: String -> String -> FailCont r Error Int
 legendreSymbol "" _ = FailCont $ \f -> f (Left EmptyInput)
 legendreSymbol _ "" = FailCont $ \f -> f (Left EmptyInput)
-legendreSymbol s1 s2 = FailCont $ \f -> 
-  case readMaybe s2 of
-    Nothing -> f (Left (ParseFailed s2))
-    Just p -> if notPrime p then f (Left (NotPrime p)) else 
-      case readMaybe s1 of
-        Nothing -> f (Left (ParseFailed s1))
-        Just a -> f (Right (getLegendreSymbol a p))
+legendreSymbol s1 s2 = FailCont $ \f ->
+  case readMaybeHelper s1 s2 of
+    Right (a, p) -> if notPrime p then f (Left (NotPrime p)) else f (Right (getLegendreSymbol a p))
+    Left err -> f (Left err)
 
 main = do 
   print $ evalFailCont $ addInts "13" "42"         -- Right 55
@@ -64,7 +65,7 @@ main = do
   print $ evalFailCont $ legendreSymbol "" "13"    -- Left EmptyInput
   print $ evalFailCont $ legendreSymbol "1" ""     -- Left EmptyInput
   print $ evalFailCont $ legendreSymbol "1" "x"    -- Left (ParseFailed "x")
-  print $ evalFailCont $ legendreSymbol "x" "1"    -- Left (NotPrime 1)
+  print $ evalFailCont $ legendreSymbol "x" "1"    -- Left (ParseFailed "x") now this case is the same as the next one, because we parse elements first
   print $ evalFailCont $ legendreSymbol "x" "2"    -- Left (ParseFailed "x")
   print $ evalFailCont $ legendreSymbol "1" "4"    -- Left (NotPrime 4)
   print $ evalFailCont $ legendreSymbol "1" "13"   -- Right 1
