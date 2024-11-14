@@ -73,9 +73,19 @@ prop_one_element_after_correct_evaluation = property $ do
       _ -> failure
     Left _ -> success
 
+prop_stack_underflow_when_not_enough_elements :: Property
+prop_stack_underflow_when_not_enough_elements = property $ do
+  expr <- forAll genExpr
+  let compiled = (compile expr) ++ [HW.StackMachine.Add]
+  let executed = execProgram compiled initialState
+  case executed of
+    Right res -> failure
+    Left _ -> success
+
 interpreterTests =
   [
-    testProperty "In case of correct evaluation only 1 element left on stack" prop_one_element_after_correct_evaluation
+    testProperty "In case of correct evaluation only 1 element left on stack" prop_one_element_after_correct_evaluation,
+    testProperty "When not enough elements on the stack the StackUnderflow error should occur" prop_stack_underflow_when_not_enough_elements
   ]
 
 main :: IO ()
