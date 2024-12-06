@@ -31,5 +31,6 @@ It made sense to separate different logical parts into different files so thats 
 === Why certain libraries were chosen
 - `vector` - this was used to be able to store the board in a data structure that allows efficient random access to data. At first I was using `Data.Array` but changed it to Vector because of the speed (I'll take about it later)
 - `random` and `random-shuffle` - those are the 2 libraries I use when randomly generating the board. First one is used to generated seeds that are passed into `shuffle'` function from `random-shuffle`
+- `HUnit` - used for tests of course
 === Investigation of the performance
 - As mentioned above I changed Array into Vector, because it is more efficient. Array copies all elements when it comes to changing one element. But Vector doesn't do that, due to its internal implementation it _usually_ copies only a few elements. Well, the worst case scenario is still O(N) but it doesn't happen that often, since the changes we make are distributed evenly throughout the 2d vector, because of random.

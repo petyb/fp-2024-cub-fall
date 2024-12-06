@@ -69,8 +69,8 @@ play board = do
             let nums = map readMaybe (words input) :: [Maybe Int]
             case nums of
                 [Just x, Just y, Just val] -> do
-                    let next = setCell bboard (x, y) val
-                    case (isValid bboard (x, y) val, solve next) of
+                    let next = setCell bboard (y, x) val
+                    case (isValid bboard (y, x) val, solve next) of
                         (True, Right res) -> play $ return next
                         _ -> do
                             putStrLn "Invalid turn. Please try again"
