@@ -1,4 +1,4 @@
-module SampleBoards (board1, board1Solved, solvedBoard, emptyBoard, invalidBoard) where
+module SampleBoards (board1, board1Solved, solvedBoard, emptyBoard, invalidBoard, boardHard) where
 
 import Board
 import qualified Data.Vector as V
@@ -56,3 +56,15 @@ solvedBoard = listToBoard [
     [9, 6, 1, 5, 3, 7, 2, 8, 4],
     [2, 8, 7, 4, 1, 9, 6, 3, 5],
     [3, 4, 5, 2, 8, 6, 1, 7, 9]]
+
+boardHard :: Board
+boardHard = listToBoard [
+    [0, 0, 0, 0, 0, 9, 0, 4, 0],
+    [0, 0, 0, 5, 0, 0, 0, 0, 0],
+    [0, 9, 0, 0, 4, 0, 7, 0, 0],
+    [0, 0, 3, 0, 7, 0, 0, 8, 0],
+    [0, 7, 0, 0, 0, 0, 0, 5, 0],
+    [0, 1, 0, 0, 3, 0, 9, 0, 0],
+    [7, 0, 9, 0, 0, 0, 0, 3, 0],
+    [0, 0, 0, 0, 0, 4, 0, 0, 0],
+    [0, 4, 0, 8, 0, 0, 0, 0, 9]]
